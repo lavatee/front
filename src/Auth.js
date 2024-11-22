@@ -32,11 +32,11 @@ function Auth() {
         return(
             <div>
                 <h2>{message}</h2>
-                <img style={{width: '50vw', marginLeft: '25vw', marginTop: '10vh'}} src="https://raw.githubusercontent.com/lavatee/facepalm/refs/heads/main/img/eachother.png"/>
-                <input style={{marginLeft: '20vw', marginTop: '3vh'}} placeholder="Почта" id="sign_in_email"/>
-                <input style={{marginLeft: '20vw', marginTop: '3vh'}} placeholder="Пароль" id="sign_in_password"/>
-                <button style={{marginLeft: '33vw', marginTop: '3vh'}} onClick={() => SignIn(navigate)}>Войти</button>
-                <button style={{marginLeft: '33vw', marginTop: '3vh'}} onClick={() => {
+                <img style={{width: '50vw', maxWidth: 300, marginTop: '10vh'}} src="https://raw.githubusercontent.com/lavatee/facepalm/refs/heads/main/img/eachother.png"/>
+                <input style={{marginTop: '3vh'}} placeholder="Почта" id="sign_in_email"/>
+                <input style={{marginTop: '3vh'}} placeholder="Пароль" id="sign_in_password"/>
+                <button style={{marginTop: '3vh'}} onClick={() => SignIn(navigate)}>Войти</button>
+                <button style={{marginTop: '3vh'}} onClick={() => {
                     setType("sign up")
                     document.getElementById("sign_in_email").value = ""
                     document.getElementById("sign_in_password").value = ""
@@ -48,12 +48,12 @@ function Auth() {
         return(
             <div>
                 <h2>{message}</h2>
-                <img style={{width: '50vw', marginLeft: '25vw', marginTop: '10vh'}} src="https://raw.githubusercontent.com/lavatee/facepalm/refs/heads/main/img/eachother.png"/>
-                <input style={{marginLeft: '20vw', marginTop: '3vh'}} placeholder="Почта" id="sign_up_email"/>
-                <input style={{marginLeft: '20vw', marginTop: '3vh'}} placeholder="Пароль" id="sign_up_password"/>
-                <input style={{marginLeft: '20vw', marginTop: '3vh'}} placeholder="Имя" id="sign_up_name"/>
-                <input style={{marginLeft: '20vw', marginTop: '3vh'}} placeholder="Айди" id="sign_up_tag"/>
-                <button style={{marginLeft: '33vw', marginTop: '3vh'}} onClick={() => {
+                <img style={{width: '50vw', maxWidth: 300, marginTop: '10vh'}} src="https://raw.githubusercontent.com/lavatee/facepalm/refs/heads/main/img/eachother.png"/>
+                <input style={{marginTop: '3vh'}} placeholder="Почта" id="sign_up_email"/>
+                <input style={{marginTop: '3vh'}} placeholder="Пароль" id="sign_up_password"/>
+                <input style={{marginTop: '3vh'}} placeholder="Имя" id="sign_up_name"/>
+                <input style={{marginTop: '3vh'}} placeholder="Айди" id="sign_up_tag"/>
+                <button style={{marginTop: '3vh'}} onClick={() => {
                     try {
                         SignUp()
                         
@@ -61,14 +61,14 @@ function Auth() {
                         console.error(err)
                     }
                     
-                }}>Sign up</button>
-                <button style={{marginLeft: '33vw', marginTop: '3vh'}} onClick={() => {
+                }}>Создать аккаунт</button>
+                <button style={{marginTop: '3vh'}} onClick={() => {
                     setType("sign in")
                     document.getElementById("sign_up_email").value = ""
                     document.getElementById("sign_up_password").value = ""
                     document.getElementById("sign_up_name").value = ""
                     document.getElementById("sign_up_tag").value = ""
-                }}>Sign in</button>
+                }}>Войти</button>
             </div>
         )
     }

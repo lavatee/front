@@ -82,14 +82,14 @@ export function OneChat() {
     }, [])
     return(
         <div>
-            <div style={{position: 'fixed', marginTop: '0vh', display: 'flex', justifyContent: 'space-around', backgroundColor: '#0D0D0D', paddingTop: '3vh'}}>
+            <div style={{position: 'fixed', top: '0vh', display: 'flex', justifyContent: 'space-around', backgroundColor: '#0D0D0D', paddingTop: '3vh'}}>
                 <button onClick={() => navigate("/chats")}>{"< Назад"}</button>
                 <h1>{messages.length != 0 && messages ? messages[0].TeamProjectName : ""}</h1>
             </div>
             
             <h3>{message == "ok" ? "" : message}</h3>
             <div>
-                <ul style={{marginTop: '9vh', marginBottom: '11vh'}}>
+                <ul style={{marginTop: '15vh', marginBottom: '15vh'}}>
                     {
                         messages.map(message => (
                             <li key={message.Id} onClick={message.UserId == Number(localStorage.getItem("user_id")) ? () => setMessageTo(message.Id) : () => {}}>

@@ -7,7 +7,7 @@ import { UserProfile } from './Users';
 import { OneChat, UserChats } from './Chats';
 
 export const backend = "/api"
-export const wsAddress = "ws://localhost:8000/chat/:chatid/user/:userid"
+export const wsAddress = "ws://77.222.46.202/api/chat/:chatid/user/:userid"
 
 export const roles = {
   "Frontend Engineer": ["React", "Angular", "Vue"],

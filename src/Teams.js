@@ -85,7 +85,7 @@ export function NewTeam() {
             <button onClick={() => navigate("/teams")}>{"< Back"}</button>
             <h1>Создайте свою команду</h1>
             <div>
-                <input style={{marginLeft: '20vw'}} placeholder="Name" id="teamName"/>
+                <input placeholder="Name" id="teamName"/>
             </div>
             
             <textarea placeholder="Description" id="teamDescription"/>
