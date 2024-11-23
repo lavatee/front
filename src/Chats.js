@@ -53,7 +53,7 @@ export function UserChats() {
 
 export function OneChat() {
     const params = useParams()
-    const socket = new WebSocket(`ws://77.222.46.250/ws/chat/${params.id}/user/${localStorage.getItem("user_id")}`);
+    const socket = new WebSocket(`/api/ws/chat/${params.id}/user/${localStorage.getItem("user_id")}`);
 
     socket.onopen = function(event) {
         console.log('Connected to the WebSocket server');
