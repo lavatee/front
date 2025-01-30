@@ -43,7 +43,7 @@ export function Teams() {
             <h1>Команды, имеющие открытые роли, подходящие вашему стеку:</h1>
             <ul>
                 {   teams ?
-                    teams.map(team => (
+                    teams.reverse().map(team => (
                         <li key={team.Id} onClick={() => navigate(`/team/${team.Id}`)}>
                             <h2>{team.ProjectName}</h2>
                             <p>{team.Description}</p>
@@ -90,26 +90,27 @@ export function NewTeam() {
             
             <textarea placeholder="Description" id="teamDescription"/>
             <h2>Добавьте роли, которые нужны в вашей команде</h2>
-            <input type="text" list="roles" placeholder="Role" id="roleName" onChange={() => setRole(document.getElementById("roleName").value)}/>
-            <datalist id="roles">
+            <select id="roleName" onChange={() => setRole(document.getElementById("roleName").value)}>
+                <option value="" disabled selected>Роль</option>
                 {
                     roleNames.map(roleName => (
-                        <option>{roleName}</option>
+                        <option value={roleName}>{roleName}</option>
                     ))
                 }
-            </datalist>
+            </select>
             <div>{roles[role] != undefined ? 
             <div>
                 <div>{roles[role].length > 0 ?
-                    <input type="text" list="technologies" placeholder="Main technology of role" id="roleMainTechnology" style={{marginLeft: '20vw'}}/>
+                    <select id="roleMainTechnology">
+                        <option value="" disabled selected>Главная технология роли</option>
+                        {
+                            roles[role].map(technology => (
+                                <option value={technology}>{technology}</option>
+                            ))
+                        }
+                    </select>
                 : ""}</div>
-                <datalist id="technologies">
-                    {
-                        roles[role].map(technology => (
-                            <option>{technology}</option>
-                        ))
-                    }
-                </datalist>
+                
                 <textarea style={{marginLeft: '5vw'}} placeholder="Write what is required or nice to have for this role" id="niceToHave"/>
                 <button onClick={AddRole}>Добавить роль</button>
             </div>
@@ -127,14 +128,14 @@ export function NewTeam() {
             </ul>
             <h2>Выбери свою роль</h2>
             <p>Если вы не знаете какую роль выбрать, можете просто выбрать "Team Owner"</p>
-            <input type="text" list="roles" placeholder="Role" id="userRoleName" onChange={() => setUserRoleName(document.getElementById("userRoleName").value)}/>
-            <datalist id="roles">
+            <select id="userRoleName" onChange={() => setUserRoleName(document.getElementById("userRoleName").value)}>
+                <option value="" disabled selected>Роль</option>
                 {
                     roleNames.map(roleName => (
-                        <option>{roleName}</option>
+                        <option value={roleName}>{roleName}</option>
                     ))
                 }
-            </datalist>
+            </select>
             <div>{roles[userRoleName] != undefined ? 
             <div>
                 <div>{roles[userRoleName].length > 0 ?
@@ -160,10 +161,10 @@ export function NewTeam() {
                         </div>
                     : ""
                 }
-            <button onClick={() => RequestToApi(CreateTeam, SaveTeam)}>Create</button>
+            <button onClick={() => RequestToApi(CreateTeam, SaveTeam)}>Создать</button>
             {
                 status == "ok" ?
-                <h3>Твоя команда успешно создана</h3>
+                <h3 style={{color: "green"}}>Команда успешно создана</h3>
                 :
                 <h3>{status == "rpc error: code = InvalidArgument desc = team must have a creator" ? "Выберите свою роль" : "Заполните все поля или добавьте роли"}</h3>
             }
@@ -283,7 +284,7 @@ export function UserTeams() {
     return(
         <div>
             <button onClick={() => navigate("/teams")}>{"< Back"}</button>
-            <h3 style={{color: message == "ok" ? "green" : "red", width: '80vw'}}>{message == "ok" ? "Team was deleted successfuly" : message}</h3>
+            <h3 style={{color: message == "ok" ? "green" : "red", width: '80vw'}}>{message == "ok" ? "Команда была удалена успешно" : message}</h3>
             <ul>
                 {
                     teams ?
@@ -294,11 +295,11 @@ export function UserTeams() {
                                 <p>{team.Description}</p>
                                 {
                                     teamToDelete == team.Id ?
-                                        <h3>Enter your password to delete team</h3> : ""
+                                        <h3>Введи свой пароль чтобы удалить команду</h3> : ""
                                 }
                                 {
                                     teamToDelete == team.Id ?
-                                        <input placeholder="Password" id="password" /> : ""
+                                        <input placeholder="Пароль" id="password" /> : ""
                                 }
                             </li>
                             {
@@ -394,7 +395,7 @@ export function OneTeam() {
             setTeam(data.team)
         }
         else {
-            setMessage("Bad connection")
+            setMessage("Плохое соединение")
         }
     }
     async function GetCreator() {
@@ -411,7 +412,7 @@ export function OneTeam() {
             setCreator(data.name)
         }
         else {
-            setMessage("Bad connection")
+            setMessage("Плохое соединение")
         }
     }
 }

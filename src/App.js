@@ -1,4 +1,5 @@
 import './App.css';
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
 import Auth from './Auth';
 import { NewTeam, OneTeam, Teams, UserTeams } from './Teams';
@@ -25,6 +26,8 @@ export const roles = {
   "Team Owner": []
 }
 
+const mainPage = "http://localhost:3000/"
+
 function App() {
   return (
     <BrowserRouter>
@@ -39,6 +42,7 @@ function App() {
         <Route exact path='/user/:id' element={<UserProfile/>}/>
         <Route exact path='/chats' element={<UserChats/>}/>
         <Route exact path='/chat/:id' element={<OneChat/>}/>
+        <Route exact path='/notifications' element={<Notifications/>}/>
         {/* 
         
         
@@ -62,8 +66,53 @@ export function Header(props) {
       <h4 onClick={() => navigate("/teams")} style={{fontWeight: props.page == "teams" ? 900 : 600}}>Команды</h4>
       <h4 onClick={() => navigate("/chats")} style={{fontWeight: props.page == "chats" ? 900 : 600}}>Чаты</h4>
       <h4 onClick={() => navigate(`/user/${localStorage.getItem("user_id")}`)} style={{fontWeight: props.page == "profile" ? 900 : 600}}>Профиль</h4>
+      <h4 onClick={() => navigate("/notifications")} style={{fontWeight: props.page == "notifications" ? 900 : 600}}>Уведомления</h4>
     </div>
   )
+}
+
+function Notifications() {
+    const [notifications, setNotifications] = useState(null)
+    const [message, setMessage] = useState("")
+    useEffect(() => {
+        RequestToApi(GetNots, SaveNots)
+    }, [])
+    return(
+      <div>
+        <Header page="notifications"/>
+        <h1>Ваши уведомления</h1>
+          <h3>{message}</h3>
+          <ul>
+              {
+                notifications ?
+                notifications.reverse().map(not => (
+                  <li key={not.Id}>
+                    <h3>{not.Text}</h3>
+                  </li>
+                ))
+                : ""
+              }
+          </ul>
+      </div>
+        
+    )
+    async function GetNots() {
+        const response = await fetch(`${backend}/api/notifications`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+            }
+        })
+      return response
+    }
+    async function SaveNots(data, status) {
+        if (status == 200) {
+            setNotifications(data.notifications)
+        }
+        else {
+            setMessage(data.message)
+        }
+    }
 }
 
 export async function RequestToApi(fetchFunc, saveFunc) { 
@@ -80,14 +129,14 @@ export async function RequestToApi(fetchFunc, saveFunc) {
         })
 
           if (refreshResponse.status === 401) { 
-              alert("Ваш токен истек"); 
+              alert(`Вы не авторизованы, перейдите на главную страницу: ${mainPage}`); 
           } else { 
               const refreshData = await refreshResponse.json();
               localStorage.setItem("access_token", refreshData.access)
               localStorage.setItem("refresh_token", refreshData.refresh)
               const response = await fetchFunc()
               if (response.status === 401) { 
-                alert("Ваш токен истек"); 
+                alert(`Вы не авторизованы, перейдите на главную страницу: ${mainPage}`); 
               } else {
                 const data = await response.json();
                 saveFunc(data, response.status)

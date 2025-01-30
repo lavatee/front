@@ -53,7 +53,7 @@ export function UserChats() {
 
 export function OneChat() {
     const params = useParams()
-    const socket = new WebSocket(`ws://77.222.46.202/api/ws/chat/${params.id}/user/${localStorage.getItem("user_id")}`);
+    const socket = new WebSocket(`ws://62.60.239.229/api/ws/ws/chat/${params.id}/user/${localStorage.getItem("user_id")}`);
 
     socket.onopen = function(event) {
         console.log('Connected to the WebSocket server');
@@ -79,7 +79,15 @@ export function OneChat() {
     // const [editMessageResponse, setEditMessageResponse] = useState("")
     useEffect(() => {
         RequestToApi(GetMessages, SaveMessages)
+        
     }, [])
+    useEffect(() => {
+        if (document.getElementById(`${messages[messages?.length - 1]?.Id}`)) {
+            const target = document.getElementById(`${messages[messages?.length - 1].Id}`)
+            target.scrollIntoView({ behavior: 'smooth' });
+            console.log("eshkere")
+        }
+    }, [messages])
     return(
         <div>
             <div style={{position: 'fixed', top: '0vh', display: 'flex', justifyContent: 'space-around', backgroundColor: '#0D0D0D', paddingTop: '3vh'}}>
@@ -92,7 +100,7 @@ export function OneChat() {
                 <ul style={{marginTop: '15vh', marginBottom: '15vh'}}>
                     {
                         messages.map(message => (
-                            <li key={message.Id} onClick={message.UserId == Number(localStorage.getItem("user_id")) ? () => setMessageTo(message.Id) : () => {}}>
+                            <li key={message.Id} onClick={message.UserId == Number(localStorage.getItem("user_id")) ? () => setMessageTo(message.Id) : () => {}} id={`${message.Id}`}>
                                 <h4>{message.UserName}</h4>
                                 <p>{message.Text}</p>
                                 {
@@ -110,6 +118,7 @@ export function OneChat() {
                                         }
                                     </div>
                                     : ""
+                                    
                                 }
                             </li>
                         ))

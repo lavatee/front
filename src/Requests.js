@@ -19,21 +19,21 @@ export function NewRequest() {
         <div>
             <button onClick={() => navigate(`/team/${params.teamid}`)}>{"< Back"}</button>
             <h1>Request to {team != null ? team.ProjectName : " ..."}</h1>
-            <input placeholder="Your role in team" type="text" list="teamRoles" id="userRole"/>
-            <datalist id="teamRoles">
+            <select id="userRole">
+                <option value="" disabled selected>Ваша роль в команде</option>
                 {   team != null ?
                     team.Roles.map(role => (
-                        <option>{role?.IsOpen ? `${role.Id}: ` + role.Name : ""}{role?.IsOpen && role.MainTechnology != undefined ? " " + role.MainTechnology : ""}</option>
+                        <option value={role.Id}>{role?.IsOpen ? role.Name : ""}{role?.IsOpen && role.MainTechnology != undefined ? " " + role.MainTechnology : ""}</option>
                     )) : ""
                 }
-            </datalist>
-            <textarea placeholder="Write shortly about your experience (at most 200 symbols)" id="cv"/>
+            </select>
+            <textarea placeholder="Напишите немного о своем опыте (максимум 200 символов)" id="cv"/>
             {
                 message == "ok" ? "" :
                 <button onClick={() => RequestToApi(SendRequest, SaveSendRequest)}>Send request</button>
             }
             
-            <h2 style={{color: message == "ok" ? "green" : "red"}}>{message == "ok" ? "Request was sended successfuly" : message}</h2>
+            <h2 style={{color: message == "ok" ? "green" : "red"}}>{message == "ok" ? "Запрос отправлен успешно" : message}</h2>
         </div>
     )
     async function GetTeam() {
@@ -56,10 +56,11 @@ export function NewRequest() {
     }
     async function SendRequest() {
         const cv = document.getElementById("cv").value
-        const roleId = Number(document.getElementById("userRole").value.split(":")[0])
+        const roleId = document.getElementById("userRole").value
+        console.log(roleId)
         const data = {
             cv: cv,
-            roleId: roleId,
+            roleId: Number(roleId),
             teamId: Number(params.teamid)
         }
         const response = await fetch(`${backend}/api/requests`, {
@@ -86,26 +87,35 @@ export function UserRequests() {
     const navigate = useNavigate()
     const [requests, setRequests] = useState([])
     const [message, setMessage] = useState("")
-    const [currentRequest, setCurrentRequest] = useState(0)
+    // const [currentRequest, setCurrentRequest] = useState(0)
+    let currentRequest = 0
     useEffect(() => {
         RequestToApi(GetRequests, SaveRequests)
     }, [])
     return(
         <div>
             <button onClick={() => navigate("/teams")}>{"< Back"}</button>
-            <h1>Requests to your teams:</h1>
+            <h1>Запросы в ваши команды:</h1>
             <h2>{message == "ok" ? "" : message}</h2>
             <ul>
                 {
                     requests ? 
-                    requests.map(request => (
+                    requests.reverse().map(request => (
                         <li key={request.Id}>
                             <h2>{request.UserName}</h2>
-                            <h3>Team: {request.ProjectName}</h3>
-                            <h3>Role: {request.RoleName} {request.MainTechnology}</h3>
-                            <p>Message: {request.CV}</p>
-                            <button onClick={() => RequestToApi(() => AcceptRequest(request.TeamId, request.RoleId, request.UserId, request.Id), SaveRequest)} style={{color: "green", fontWeight: 700}}>Accept</button>
-                            <button onClick={() => RequestToApi(() => RejectRequest(request.Id), SaveRequest)} style={{color: "red", fontWeight: 700}}>Reject</button>
+                            <h3>Команда: {request.ProjectName}</h3>
+                            <h3>Роль: {request.RoleName} {request.MainTechnology}</h3>
+                            <p>Сообщение: {request.CV}</p>
+                            <button onClick={() => {
+                                currentRequest = request.Id
+                                console.log(currentRequest)
+                                RequestToApi(() => AcceptRequest(request.TeamId, request.RoleId, request.UserId, request.Id), SaveRequest)
+                            }} style={{color: "green", fontWeight: 700}}>Принять</button>
+                            <button onClick={() => {
+                                currentRequest = request.Id
+                                console.log(currentRequest)
+                                RequestToApi(() => RejectRequest(request.Id), SaveRequest)
+                            }} style={{color: "red", fontWeight: 700}}>Отклонить</button>
                         </li>
                     )) : ""
                 }
@@ -130,7 +140,6 @@ export function UserRequests() {
         }
     }
     async function AcceptRequest(teamId, roleId, userId, requestId) {
-        setCurrentRequest(requestId)
         const response = await fetch(`${backend}/api/teams/join`, {
             method: "POST",
             headers: {
@@ -139,10 +148,10 @@ export function UserRequests() {
             },
             body: JSON.stringify({teamId: teamId, roleId: roleId, userId: userId})
         })
+        
         return response
     }
     async function RejectRequest(requestId) {
-        setCurrentRequest(requestId)
         const response = await fetch(`${backend}/api/requests/${requestId}`, {
             method: "DELETE",
             headers: {
@@ -152,13 +161,15 @@ export function UserRequests() {
         return response
     }
     function SaveRequest(data, status) {
+        console.log(currentRequest)
         if (status == 200) {
             setRequests(requests.filter(req => req.Id != currentRequest))
             setMessage("ok")
         }
         else {
-            setMessage(data.message)
+            setMessage("Пользователь уже есть в команде")
         }
-        setCurrentRequest(0)
+        
+        currentRequest = 0
     }
 }
