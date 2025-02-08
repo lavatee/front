@@ -6,8 +6,8 @@ import { NewTeam, OneTeam, Teams, UserTeams } from './Teams';
 import { NewRequest, UserRequests } from './Requests';
 import { UserProfile } from './Users';
 import { OneChat, UserChats } from './Chats';
-
-export const backend = "/api"
+import { BsList, BsFillPeopleFill, BsFillPersonFill, BsChatRightDotsFill, BsFillTrophyFill, BsFillBellFill } from "react-icons/bs";
+export const backend = "http://localhost:8000"
 export const wsAddress = "ws://77.222.46.250/api/chat/:chatid/user/:userid"
 
 export const roles = {
@@ -59,15 +59,28 @@ function App() {
 }
 
 export function Header(props) {
+  const [state, setState] = useState(false)
   const navigate = useNavigate()
   return (
-    <div style={{display: 'flex', justifyContent: 'space-around', alignContent: 'center', alignItems: 'center', marginBottom: '3vh', marginTop: '3vh'}}>
-      <img src='https://raw.githubusercontent.com/lavatee/facepalm/refs/heads/main/img/eachother.png' style={{width: '20vw', minWidth: 120}}/>
-      <h4 onClick={() => navigate("/teams")} style={{fontWeight: props.page == "teams" ? 900 : 600}}>Команды</h4>
-      <h4 onClick={() => navigate("/chats")} style={{fontWeight: props.page == "chats" ? 900 : 600}}>Чаты</h4>
-      <h4 onClick={() => navigate(`/user/${localStorage.getItem("user_id")}`)} style={{fontWeight: props.page == "profile" ? 900 : 600}}>Профиль</h4>
-      <h4 onClick={() => navigate("/notifications")} style={{fontWeight: props.page == "notifications" ? 900 : 600}}>Уведомления</h4>
+    <div style={{position: 'fixed', top: '0vh', zIndex: 999}}>
+    <div style={{display: 'flex', justifyContent: 'space-around', alignContent: 'center', alignItems: 'center', marginBottom: '3vh', marginTop: '0', background: "rgba(0, 0, 0, 0.7)", backdropFilter: "blur(40px)", height: '15vh'}}>
+      <BsList style={{color: "white", position: 'absolute', left: '10vw', top: '6vh', fontSize: 30}} onClick={() => setState(!state)}/>
+      
+      
+      <img src='https://raw.githubusercontent.com/lavatee/facepalm/refs/heads/main/img/eachother.png' style={{width: '15vw', minWidth: 120}}/>
+      
     </div>
+    {state ?
+        <div style={{background: "rgba(255, 255, 255, 0.1)", boxShadow: "0px 4px 70px rgba(0, 0, 0, 0.7)", backdropFilter: "blur(40px)", borderRadius: "0px 50px 50px 50px", left: '10vw', top: '10vh', position: "absolute", display: 'grid', width: "30vw", minWidth: '190px', padding: "10px"}}>
+          <h4 onClick={() => navigate("/teams")} style={{fontWeight: props.page == "teams" ? 900 : 400}}><BsFillPeopleFill style={{color: "white", fontSize: 15}}/> Команды</h4>
+          <h4 onClick={() => navigate("/chats")} style={{fontWeight: props.page == "chats" ? 900 : 400}}><BsChatRightDotsFill style={{color: "white", fontSize: 15}}/> Чаты</h4>
+          <h4 onClick={() => navigate(`/user/${localStorage.getItem("user_id")}`)} style={{fontWeight: props.page == "profile" ? 900 : 400}}><BsFillPersonFill style={{color: "white", fontSize: 15}}/> Профиль</h4>
+          <h4 onClick={() => navigate("/notifications")} style={{fontWeight: props.page == "notifications" ? 900 : 400}}><BsFillBellFill style={{color: "white", fontSize: 15}}/> Уведомления</h4>
+        </div>
+      : ""
+    }
+    </div>
+    
   )
 }
 
@@ -80,7 +93,7 @@ function Notifications() {
     return(
       <div>
         <Header page="notifications"/>
-        <h1>Ваши уведомления</h1>
+        <h1 style={{marginTop: "15vh"}}>Ваши уведомления</h1>
           <h3>{message}</h3>
           <ul>
               {

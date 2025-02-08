@@ -97,7 +97,7 @@ function Auth() {
                 document.getElementById("sign_up_name").value = ""
                 document.getElementById("sign_up_tag").value = ""
                 setType("sign in")
-                setMessage("Sign in to the account you created")
+                setMessage("Войдите в созданный аккаунт")
             }
             else {
                 setMessage("Айди уже занято")

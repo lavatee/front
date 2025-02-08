@@ -14,7 +14,7 @@ export function UserChats() {
     return(
         <div>
             <Header page="chats"/>
-            <h1>Ваши чаты:</h1>
+            <h1 style={{marginTop: "15vh"}}>Ваши чаты:</h1>
             <ul>
                 {
                     chats.map(chat => (
@@ -90,7 +90,7 @@ export function OneChat() {
     }, [messages])
     return(
         <div>
-            <div style={{position: 'fixed', top: '0vh', display: 'flex', justifyContent: 'space-around', backgroundColor: '#0D0D0D', paddingTop: '3vh'}}>
+            <div style={{position: 'fixed', top: '0vh', display: 'flex', justifyContent: 'space-around', backgroundColor: '#0D0D0D', paddingTop: '3vh', zIndex: 999, background: "rgba(255, 255, 255, 0.1)", boxShadow: "0px 4px 70px rgba(0, 0, 0, 0.7)", backdropFilter: "blur(40px)"}}>
                 <button onClick={() => navigate("/chats")}>{"< Назад"}</button>
                 <h1>{messages.length != 0 && messages ? messages[0].TeamProjectName : ""}</h1>
             </div>
@@ -124,7 +124,7 @@ export function OneChat() {
                         ))
                     }
                 </ul>
-                <div style={{position: 'fixed', bottom: '0vh', display: 'flex', justifyContent: 'space-around', backgroundColor: '#0D0D0D', width: '100vw', paddingBottom: '4vh'}}>
+                <div style={{position: 'fixed', bottom: '0vh', display: 'flex', justifyContent: 'space-around', backgroundColor: '#0D0D0D', width: '100vw', paddingBottom: '4vh', background: "rgba(255, 255, 255, 0.1)", boxShadow: "0px 4px 70px rgba(0, 0, 0, 0.7)", backdropFilter: "blur(40px)", paddingTop: 10}}>
                     <input id="userMessage" placeholder="Сообщение"/>
                     <button onClick={() => {socket.send(JSON.stringify({Text: document.getElementById("userMessage").value, UserId: Number(localStorage.getItem("user_id"))})); document.getElementById("userMessage").value = ""}}>Отправить</button>
                 </div>

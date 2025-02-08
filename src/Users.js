@@ -39,13 +39,13 @@ export function UserProfile() {
     return(
         <div>
             <Header page={"profile"}/>
-            <h3>{message == "ok" ? "" : message}</h3>
+            <h3 style={{marginTop: "15vh"}}>{message == "ok" ? "" : message}</h3>
             
             {
                 user ?
                 <div>
                     <h2>Личные данные:</h2>
-                    <div>
+                    <div className="profile">
                         <h3>Имя: {!editingInfo ? user.name : <input value={newName} onChange={(e) => setNewName(e.target.value)} id="newName"/>}</h3>
                         <h3>Айди: {!editingInfo ? "@" + user.tag : <input value={newTag} onChange={(e) => setNewTag(e.target.value)} id="newTag"/>}</h3>
                         {
@@ -71,7 +71,7 @@ export function UserProfile() {
                         }
                     </div>
                     <h2>Технологический стек:</h2>
-                    <div>
+                    <div className="profile">
                         <h3>Роль: {!editingStack ? user.role :
                             <select id="newRole" value={newRole} onChange={() => setNewRole(document.getElementById("newRole").value)}>
                                 <option value={""}>Нет</option>

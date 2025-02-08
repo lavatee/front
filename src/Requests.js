@@ -17,8 +17,8 @@ export function NewRequest() {
     )
     return(
         <div>
-            <button onClick={() => navigate(`/team/${params.teamid}`)}>{"< Back"}</button>
-            <h1>Request to {team != null ? team.ProjectName : " ..."}</h1>
+            <button onClick={() => navigate(`/team/${params.teamid}`)}>{"< Назад"}</button>
+            <h1>Запрос в {team != null ? team.ProjectName : " ..."}</h1>
             <select id="userRole">
                 <option value="" disabled selected>Ваша роль в команде</option>
                 {   team != null ?
@@ -94,7 +94,7 @@ export function UserRequests() {
     }, [])
     return(
         <div>
-            <button onClick={() => navigate("/teams")}>{"< Back"}</button>
+            <button onClick={() => navigate("/teams")}>{"< Назад"}</button>
             <h1>Запросы в ваши команды:</h1>
             <h2>{message == "ok" ? "" : message}</h2>
             <ul>
@@ -106,16 +106,19 @@ export function UserRequests() {
                             <h3>Команда: {request.ProjectName}</h3>
                             <h3>Роль: {request.RoleName} {request.MainTechnology}</h3>
                             <p>Сообщение: {request.CV}</p>
-                            <button onClick={() => {
-                                currentRequest = request.Id
-                                console.log(currentRequest)
-                                RequestToApi(() => AcceptRequest(request.TeamId, request.RoleId, request.UserId, request.Id), SaveRequest)
-                            }} style={{color: "green", fontWeight: 700}}>Принять</button>
-                            <button onClick={() => {
-                                currentRequest = request.Id
-                                console.log(currentRequest)
-                                RequestToApi(() => RejectRequest(request.Id), SaveRequest)
-                            }} style={{color: "red", fontWeight: 700}}>Отклонить</button>
+                            <div>
+                                <button onClick={() => {
+                                    currentRequest = request.Id
+                                    console.log(currentRequest)
+                                    RequestToApi(() => AcceptRequest(request.TeamId, request.RoleId, request.UserId, request.Id), SaveRequest)
+                                }} style={{color: "green", fontWeight: 700}}>Принять</button>
+                                <button onClick={() => {
+                                    currentRequest = request.Id
+                                    console.log(currentRequest)
+                                    RequestToApi(() => RejectRequest(request.Id), SaveRequest)
+                                }} style={{color: "red", fontWeight: 700}}>Отклонить</button>
+                            </div>
+                            
                         </li>
                     )) : ""
                 }

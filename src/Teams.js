@@ -35,7 +35,7 @@ export function Teams() {
     return(
         <div>
             <Header page="teams"/>
-            <div>
+            <div style={{display: "flex", justifyContent: "space-between", flexDirection: "row", marginTop: "15vh", maxWidth: "800px"}}>
                 <button onClick={() => navigate("/teams/new")}>Создать команду</button>
                 <button onClick={() => navigate(`/teams/${localStorage.getItem("user_id")}`)}>Мои команды</button>
                 <button onClick={() => navigate("/requests")}>Запросы в мои команды</button>
@@ -82,13 +82,13 @@ export function NewTeam() {
     return(
         <div>
             <Header page="teams"/>
-            <button onClick={() => navigate("/teams")}>{"< Back"}</button>
+            <button style={{marginTop: "15vh"}} onClick={() => navigate("/teams")}>{"< Назад"}</button>
             <h1>Создайте свою команду</h1>
             <div>
-                <input placeholder="Name" id="teamName"/>
+                <input placeholder="Имя команды" id="teamName"/>
             </div>
             
-            <textarea placeholder="Description" id="teamDescription"/>
+            <textarea placeholder="Описание" id="teamDescription"/>
             <h2>Добавьте роли, которые нужны в вашей команде</h2>
             <select id="roleName" onChange={() => setRole(document.getElementById("roleName").value)}>
                 <option value="" disabled selected>Роль</option>
@@ -139,16 +139,15 @@ export function NewTeam() {
             <div>{roles[userRoleName] != undefined ? 
             <div>
                 <div>{roles[userRoleName].length > 0 ?
-                    <input type="text" list="technologies" placeholder="Main technology of role" id="roleMainTechnology"/>
+                    <select id="roleMainTechnology">
+                        <option value="" disabled selected>Главная технология роли</option>
+                        {
+                            roles[userRoleName].map(technology => (
+                                <option value={technology}>{technology}</option>
+                            ))
+                        }
+                    </select>
                 : ""}</div>
-                <datalist id="technologies">
-                    {
-                        roles ? 
-                        roles[userRoleName].map(technology => (
-                            <option>{technology}</option>
-                        )) : ""
-                    }
-                </datalist>
                 <button onClick={AddUserRole}>Сделать это своей ролью</button>
             </div>
             : ""}</div>
@@ -283,7 +282,7 @@ export function UserTeams() {
     useEffect(() => {RequestToApi(GetUserTeams, SaveTeams)}, [])
     return(
         <div>
-            <button onClick={() => navigate("/teams")}>{"< Back"}</button>
+            <button onClick={() => navigate("/teams")}>{"< Назад"}</button>
             <h3 style={{color: message == "ok" ? "green" : "red", width: '80vw'}}>{message == "ok" ? "Команда была удалена успешно" : message}</h3>
             <ul>
                 {
@@ -352,7 +351,7 @@ export function OneTeam() {
     }, [team])
     return(
         <div>
-            <button onClick={() => navigate("/teams")}>{"< Back"}</button>
+            <button onClick={() => navigate("/teams")}>{"< Назад"}</button>
             <h2>{message}</h2>
             {
                 team ?
