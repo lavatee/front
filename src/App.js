@@ -5,8 +5,10 @@ import Auth from './Auth';
 import { NewTeam, OneTeam, Teams, UserTeams } from './Teams';
 import { NewRequest, UserRequests } from './Requests';
 import { UserProfile } from './Users';
-import { OneChat, UserChats } from './Chats';
-import { BsList, BsFillPeopleFill, BsFillPersonFill, BsChatRightDotsFill, BsFillTrophyFill, BsFillBellFill } from "react-icons/bs";
+import { ChatMembers, ChatTasks, OneChat, UserChats } from './Chats';
+import { BsList, BsFillPeopleFill, BsFillPersonFill, BsChatRightDotsFill, BsBagCheckFill, BsFillBellFill, BsClipboardCheckFill } from "react-icons/bs";
+import { TasksUserCreated, UserCompletedTasks, UserCurrentTasks, UserFailedTasks } from './Tasks';
+import { UserExperience } from './Experience';
 export const backend = "http://localhost:8000"
 export const wsAddress = "ws://77.222.46.250/api/chat/:chatid/user/:userid"
 
@@ -23,10 +25,15 @@ export const roles = {
   "Data Analyst": ["Python", "C++", "Java", "R", "MATLAB", "Go", "Scala", "Julia"],
   "CTO": [],
   "System Analyst": [],
-  "Team Owner": []
+  "Team Owner": [],
+  "Gamedev Engineer": [],
+  "Product Manager": [],
+  "Android Engineer": ["Kotlin", "Java"],
+  "IOS Engineer": ["Swift"],
+  "Mobile Engineer": ["React Native", "Flutter"]
 }
 
-const mainPage = "http://localhost:3000/"
+export const mainPage = "http://localhost:3000"
 
 function App() {
   return (
@@ -43,16 +50,14 @@ function App() {
         <Route exact path='/chats' element={<UserChats/>}/>
         <Route exact path='/chat/:id' element={<OneChat/>}/>
         <Route exact path='/notifications' element={<Notifications/>}/>
-        {/* 
+        <Route exact path='/chat/:id/members' element={<ChatMembers/>}/>
+        <Route exact path='/chat/:id/tasks' element={<ChatTasks/>}/>
+        <Route exact path='/mytasks/current' element={<UserCurrentTasks/>}/>
+        <Route exact path='/mytasks/created' element={<TasksUserCreated/>}/>
+        <Route exact path='/mytasks/failed' element={<UserFailedTasks/>}/>
+        <Route exact path='/mytasks/completed' element={<UserCompletedTasks/>}/>
+        <Route exact path='/experience' element={<UserExperience/>}/>
         
-        
-        <Route exact path='/profile' elemet={Profile}/>
-        <Route exact path='/chat/:id' elemet={Chat}/>
-        
-        <Route exact path='/user/:id' elemet={User}/>
-        
-        
-         */}
       </Routes>
     </BrowserRouter>
   );
@@ -71,11 +76,13 @@ export function Header(props) {
       
     </div>
     {state ?
-        <div style={{background: "rgba(255, 255, 255, 0.1)", boxShadow: "0px 4px 70px rgba(0, 0, 0, 0.7)", backdropFilter: "blur(40px)", borderRadius: "0px 50px 50px 50px", left: '10vw', top: '10vh', position: "absolute", display: 'grid', width: "30vw", minWidth: '190px', padding: "10px"}}>
+        <div style={{background: "rgba(255, 255, 255, 0.1)", boxShadow: "0px 4px 70px rgba(0, 0, 0, 0.7)", backdropFilter: "blur(40px)", borderRadius: "0px 50px 50px 50px", left: '10vw', top: '10vh', position: "absolute", display: 'grid', width: "30vw", minWidth: '190px', padding: "10px", maxWidth: "300px"}}>
           <h4 onClick={() => navigate("/teams")} style={{fontWeight: props.page == "teams" ? 900 : 400}}><BsFillPeopleFill style={{color: "white", fontSize: 15}}/> Команды</h4>
           <h4 onClick={() => navigate("/chats")} style={{fontWeight: props.page == "chats" ? 900 : 400}}><BsChatRightDotsFill style={{color: "white", fontSize: 15}}/> Чаты</h4>
           <h4 onClick={() => navigate(`/user/${localStorage.getItem("user_id")}`)} style={{fontWeight: props.page == "profile" ? 900 : 400}}><BsFillPersonFill style={{color: "white", fontSize: 15}}/> Профиль</h4>
           <h4 onClick={() => navigate("/notifications")} style={{fontWeight: props.page == "notifications" ? 900 : 400}}><BsFillBellFill style={{color: "white", fontSize: 15}}/> Уведомления</h4>
+          <h4 onClick={() => navigate("/mytasks/current")} style={{fontWeight: props.page == "tasks" ? 900 : 400}}><BsClipboardCheckFill style={{color: "white", fontSize: 15}}/> Задачи</h4>
+          <h4 onClick={() => navigate("/experience")} style={{fontWeight: props.page == "experience" ? 900 : 400}}><BsBagCheckFill style={{color: "white", fontSize: 15}}/> Мой опыт</h4>
         </div>
       : ""
     }

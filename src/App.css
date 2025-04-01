@@ -10,16 +10,54 @@ div {
   place-items: center;
 }
 
+ul {
+  padding: 0;
+}
+
+.chosenPage {
+  margin-top: 30px;
+  position: relative; /* Необходимо для позиционирования псевдоэлемента */
+  display: inline-block; /* Чтобы подчеркивание не занимало всю ширину строки */
+  padding-bottom: 15px; /* Компенсирует высоту подчеркивания, чтобы текст не налезал на него */
+}
+
+.chosenPage::after {
+  content: '';
+  position: absolute;
+  left: -25%;
+  bottom: 0; /* Размещаем псевдоэлемент внизу */
+  width: 150%;
+  height: 7px; /* Толщина подчеркивания */
+  background-color: white; /* Цвет подчеркивания */
+  border-radius: 5px; /* Закругляем концы */
+}
+
 li {
   list-style: none;
   margin-top: 2vh;
   width: 60vw;
+  max-width: 500px;
   border-radius: 30px;
   padding: 20px;
   box-shadow: 0px 4px 70px rgba(0, 0, 0, 0.7);
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(40px);
   place-items: center;
+}
+.chatMessage {
+  border-radius: 30px 30px 30px 0px;
+  margin-left: -7vw;
+  text-align: start;
+  padding: 2px 15px 2px 20px;
+  margin-top: 1.5vh;
+}
+.userMessage {
+  border-radius: 30px 30px 0px 30px;
+  background-color: #B57BDC;
+  margin-left: 14vw;
+  text-align: end;
+  padding: 2px 15px 2px 20px;
+  margin-top: 1.4vh;
 }
 .profile {
   box-shadow: 0px 4px 70px rgba(0, 0, 0, 0.7);
@@ -42,7 +80,8 @@ h1 {
 p {
   font-family: "Jost", serif;
   color: white;
-  max-width: 90vw;
+  width: 60vw;
+  max-width: 420px;
   text-align: center;
   overflow-wrap: break-word;
   text-shadow: 0px 4px 70px rgba(0, 0, 0, 0.8);
@@ -66,7 +105,7 @@ h3 {
 h4 {
   font-family: "Jost", serif;
   color: white;
-  max-width: 70vw;
+  max-width: 40vw;
   overflow-wrap: break-word;
   text-shadow: 0px 4px 70px rgba(0, 0, 0, 1);
 }

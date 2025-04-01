@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { backend, Header, RequestToApi, roles } from "./App";
 import { useNavigate } from "react-router";
-import { BsFileExcel } from "react-icons/bs";
+import { BsFileExcel, BsArrowLeftCircleFill, BsRobot } from "react-icons/bs";
+import { FaRobot } from "react-icons/fa6";
 import { useParams } from 'react-router-dom';
 import './App.css';
 
@@ -82,13 +83,15 @@ export function NewTeam() {
     return(
         <div>
             <Header page="teams"/>
-            <button style={{marginTop: "15vh"}} onClick={() => navigate("/teams")}>{"< Назад"}</button>
+            <button style={{marginTop: "15vh"}} onClick={() => navigate("/teams")}><BsArrowLeftCircleFill style={{fontSize: 23}}/></button>
             <h1>Создайте свою команду</h1>
             <div>
-                <input placeholder="Имя команды" id="teamName"/>
+                <input placeholder="Имя команды" id="teamName" autocomplete="off"/>
             </div>
             
             <textarea placeholder="Описание" id="teamDescription"/>
+            <p>Если вы не знаете, какие роли вам нужны, вы можете сгенерировать их на основе названия и описания команды с помощью нашего ИИ:</p>
+            <button onClick={() => RequestToApi(GenerateRoles, SaveRoles)}>Сгенерировать роли</button>
             <h2>Добавьте роли, которые нужны в вашей команде</h2>
             <select id="roleName" onChange={() => setRole(document.getElementById("roleName").value)}>
                 <option value="" disabled selected>Роль</option>
@@ -119,7 +122,7 @@ export function NewTeam() {
             <ul>
                 {teamRoles.map(role => (
                     <li key={role.serialId}>
-                        <h3>{role.Name} {role.MainTechnology}</h3>
+                        <h3>{role?.Name ? role.Name : role.Role} {role.MainTechnology}</h3>
                         <p>{role.NiceToHave}</p>
                         <BsFileExcel style={{color: "white", fontSize: 40}} onClick={() => setTeamRoles(teamRoles.filter(teamRole => teamRole.serialId != role.serialId))}/>
                         
@@ -212,6 +215,7 @@ export function NewTeam() {
                 return
             }
         }
+        console.log("userRole: ", userRoleName)
         setUserRole({serialId: ++serialId, Name: userRoleName, MainTechnology: document.getElementById("roleMainTechnology") ? document.getElementById("roleMainTechnology").value : "", NiceToHave: "", IsOpen: false, TeamId: 0, Id: 1})
         document.getElementById("userRoleName").value = ""
         if (document.getElementById("roleMainTechnology") != null) {
@@ -254,6 +258,36 @@ export function NewTeam() {
         })
         return response
     }
+    async function GenerateRoles() {
+        const response = await fetch(`${backend}/api/ai_roles`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+            },
+            body: JSON.stringify({ProjectName: document.getElementById("teamName").value, Description: document.getElementById("teamDescription").value})
+        })
+        return response
+    }
+    async function SaveRoles(data, status) {
+        if (status == 200) {
+            if (!data?.roles) {
+                setStatus("Ошибка при генерации ролей")
+                return
+            }
+            for (let i = 0; i < data.roles.length; i++) {
+                data.roles[i].serialId = i
+                data.roles[i].IsOpen = true
+                data.roles[i].TeamId = 0
+                data.roles[i].Id = 0
+                data.roles[i].Name = data.roles[i].Role
+            }
+            setSerialId(data.roles[data.roles.length - 1].serialId)
+            setTeamRoles(data?.roles)
+        } else {
+            setStatus("Ошибка при генерации ролей")
+        }
+    }
 }
 
 export function UserTeams() {
@@ -282,7 +316,7 @@ export function UserTeams() {
     useEffect(() => {RequestToApi(GetUserTeams, SaveTeams)}, [])
     return(
         <div>
-            <button onClick={() => navigate("/teams")}>{"< Назад"}</button>
+            <button onClick={() => navigate("/teams")}><BsArrowLeftCircleFill style={{fontSize: 23}}/></button>
             <h3 style={{color: message == "ok" ? "green" : "red", width: '80vw'}}>{message == "ok" ? "Команда была удалена успешно" : message}</h3>
             <ul>
                 {
@@ -351,7 +385,7 @@ export function OneTeam() {
     }, [team])
     return(
         <div>
-            <button onClick={() => navigate("/teams")}>{"< Назад"}</button>
+            <button onClick={() => navigate("/teams")}><BsArrowLeftCircleFill style={{fontSize: 23}}/></button>
             <h2>{message}</h2>
             {
                 team ?

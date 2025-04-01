@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router"
 import { useParams } from "react-router-dom"
 import { backend, RequestToApi } from "./App";
+import { BsArrowLeftCircleFill } from "react-icons/bs";
 import './App.css';
 
 export function NewRequest() {
@@ -17,7 +18,7 @@ export function NewRequest() {
     )
     return(
         <div>
-            <button onClick={() => navigate(`/team/${params.teamid}`)}>{"< Назад"}</button>
+            <button onClick={() => navigate(`/team/${params.teamid}`)}><BsArrowLeftCircleFill style={{fontSize: 23}}/></button>
             <h1>Запрос в {team != null ? team.ProjectName : " ..."}</h1>
             <select id="userRole">
                 <option value="" disabled selected>Ваша роль в команде</option>
@@ -94,7 +95,7 @@ export function UserRequests() {
     }, [])
     return(
         <div>
-            <button onClick={() => navigate("/teams")}>{"< Назад"}</button>
+            <button onClick={() => navigate("/teams")}><BsArrowLeftCircleFill style={{fontSize: 23}}/></button>
             <h1>Запросы в ваши команды:</h1>
             <h2>{message == "ok" ? "" : message}</h2>
             <ul>
