@@ -10,6 +10,11 @@ export function Teams() {
     const navigate = useNavigate()
     const [teams, setTeams] = useState([])
     const [err, setErr] = useState("")
+    const [isRef, setIsRef] = useState(localStorage.getItem("action") == "ref" && localStorage.getItem("refLink") ? true : false)
+    // if (localStorage.getItem("action") == "ref" && localStorage.getItem("refLink")) {
+    //     setIsRef(true)
+    //     console.log("REF")
+    // }
     async function GetTeams() {
         const response = await fetch(`${backend}/api/teams`, {
             method: "GET",
@@ -36,7 +41,8 @@ export function Teams() {
     return(
         <div>
             <Header page="teams"/>
-            <div style={{display: "flex", justifyContent: "space-between", flexDirection: "row", marginTop: "15vh", maxWidth: "800px"}}>
+            <h2 style={{marginTop: "16vh"}}>{err}</h2>
+            <div style={{display: "flex", justifyContent: "space-between", flexDirection: "row", marginTop: "2vh", maxWidth: "800px"}}>
                 <button onClick={() => navigate("/teams/new")}>Создать команду</button>
                 <button onClick={() => navigate(`/teams/${localStorage.getItem("user_id")}`)}>Мои команды</button>
                 <button onClick={() => navigate("/requests")}>Запросы в мои команды</button>
@@ -61,10 +67,72 @@ export function Teams() {
                 
                 
             </ul>
+            {
+                isRef ?
+                <RefInvite/>
+                : ""
+            }
             
         </div>
     )
-    
+    function RefInvite() {
+            const [refInfo, setRefInfo] = useState(null)
+            const [refMessage, setRefMessage] = useState("")
+            useEffect(() => {
+                RequestToApi(GetRefInfo, SaveRefInfo)
+            }, [])
+            return (
+                <div style={{height: "100%", width: "101%", position: "fixed", background: "rgba(0, 0, 0, 0.4)", zIndex: "999"}}>
+                    <div style={{width: "75vw", maxWidth: "500px", background: "rgba(255, 255, 255, 0.1)", boxShadow: "0px 4px 70px rgba(0, 0, 0, 0.7)", backdropFilter: "blur(40px)", padding: "25px 10px 25px 10px", marginTop: "10vh", borderRadius: "40px"}}>
+                        <h2>{refInfo?.userName} приглашает вас в команду {refInfo?.projectName}</h2>
+                        <h3>На роль: {refInfo?.roleName} {refInfo?.mainTechnology ? " " + refInfo?.mainTechnology : ""}</h3>
+                        <h3>Сообщение: {refInfo?.message}</h3>
+                        <h2>{refMessage}</h2>
+                        <button onClick={() => RequestToApi(JoinByRef, SaveJoinByRef)}>Вступить в команду</button>
+                        <button onClick={() => setIsRef(false)}>Отмена</button>
+                    </div>
+                </div>
+            );
+            async function GetRefInfo() {
+                    const response = await fetch(`${backend}/api/refs/${localStorage.getItem("refLink")}`, {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+                        }
+                    })
+                    return response
+            }
+            function SaveRefInfo(data, status) {
+                if (status == 200) {
+                    setRefInfo({userName: data.userName, roleName: data.roleName, projectName: data.projectName, mainTechnology: data.mainTechnology, message: data.message})
+                } else {
+                    setErr("Ссылка недействительна")
+                    setIsRef(false)
+                }
+            }
+            async function JoinByRef() {
+                const response = await fetch(`${backend}/api/refs/join`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+                    },
+                    body: JSON.stringify({link: localStorage.getItem("refLink")})
+                })
+                return response
+            }
+            function SaveJoinByRef(data, status) {
+                if (status == 200) {
+                    setErr("Вы успешно вступили в команду, зайдите в раздел Чаты")
+                    setIsRef(false)
+                    
+                } else {
+                    setErr("Ссылка недействительна")
+                    setIsRef(false)
+                }
+                localStorage.setItem("action", "")
+                localStorage.setItem("refLink", "")
+            }
+    }
 }
 
 export function NewTeam() {
@@ -336,7 +404,11 @@ export function UserTeams() {
                                 }
                             </li>
                             {
-                                team.CreatorId == localStorage.getItem("user_id") ? <button onClick={teamToDelete == team.Id ? () => RequestToApi(() => DeleteTeam(team.Id), SaveDeleteTeam) : () => setTeamToDelete(team.Id)}>Delete team</button> : ""
+                                team.CreatorId == localStorage.getItem("user_id") ? <button onClick={teamToDelete == team.Id ? () => RequestToApi(() => DeleteTeam(team.Id), SaveDeleteTeam) : () => setTeamToDelete(team.Id)}>Удалить</button> : ""
+                                
+                            }
+                            {
+                                team.CreatorId == localStorage.getItem("user_id") ? <button onClick={() => navigate(`/edit_team/${team.Id}`)}>Редактировать</button> : ""
                             }
                         </div>
                         
@@ -391,24 +463,24 @@ export function OneTeam() {
                 team ?
                 <div>
                     <h1>{team.ProjectName}</h1>
-                    <h2>Creator: <b onClick={() => navigate(`/user/${team.CreatorId}`)}>{creator}</b></h2>
-                    <p>{team.Description}</p>
+                    <h2>Создатель: <b onClick={() => navigate(`/user/${team.CreatorId}`)}>{creator}</b></h2>
+                    <p style={{background: "rgba(255, 255, 255, 0.1)", boxShadow: "0px 4px 70px rgba(0, 0, 0, 0.7)", backdropFilter: "blur(40px)", padding: "15px", borderRadius: "40px"}}>{team.Description}</p>
                     <ul>
                         {
                             team.Roles ?
                             team.Roles.map(role => (
                                 role.IsOpen ?
                                 <li key={role.Id}>
-                                    <h3>Name: {role.Name}</h3>
+                                    <h3>Роль: {role.Name}</h3>
                                     {
-                                        role.MainTechnology ? <h3>Main technology: {role.MainTechnology}</h3> : ""
+                                        role.MainTechnology ? <h3>Стек: {role.MainTechnology}</h3> : ""
                                     }
                                     <p>{role.NiceToHave}</p>
                                 </li> : ""
                             )) : ""
                         }
                     </ul>
-                    <button onClick={() => navigate(`/requests/new/${team.Id}`)}>Join</button>
+                    <button onClick={() => navigate(`/requests/new/${team.Id}`)}>Вступить</button>
                 </div>
                 : ""
             }
@@ -447,5 +519,164 @@ export function OneTeam() {
         else {
             setMessage("Плохое соединение")
         }
+    }
+}
+
+export function EditTeam() {
+    const navigate = useNavigate()
+    const [role, setRole] = useState("")
+    const [teamRoles, setTeamRoles] = useState([])
+    const roleNames = []
+    const [userRole, setUserRole] = useState(null)
+    const [status, setStatus] = useState("")
+    const [userRoleName, setUserRoleName] = useState("")
+    const [isAdded, setIsAdded] = useState(false)
+    const [teamName, setTeamName] = useState("")
+    const [description, setDescription] = useState("")
+    useEffect(() => {
+        RequestToApi(GetTeam, SaveTeam)
+        
+    }, [])
+    const params = useParams()
+    for (let roleName in roles) {
+        roleNames.push(roleName)
+    }
+    let [serialId, setSerialId] = useState(0)
+    return(
+        <div>
+            <Header page="teams"/>
+            <button style={{marginTop: "15vh"}} onClick={() => navigate("/teams")}><BsArrowLeftCircleFill style={{fontSize: 23}}/></button>
+            <h1>Создайте свою команду</h1>
+            <div>
+                <input value={teamName} onChange={(e) => setTeamName(e.target.value)} placeholder="Имя команды" id="teamName" autocomplete="off"/>
+            </div>
+            
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Описание" id="teamDescription"/>
+            <h2>Добавьте роли, которые нужны в вашей команде</h2>
+            <select id="roleName" onChange={() => setRole(document.getElementById("roleName").value)}>
+                <option value="" disabled selected>Роль</option>
+                {
+                    roleNames.map(roleName => (
+                        <option value={roleName}>{roleName}</option>
+                    ))
+                }
+            </select>
+            <div>{roles[role] != undefined ? 
+            <div>
+                <div>{roles[role].length > 0 ?
+                    <select id="roleMainTechnology">
+                        <option value="" disabled selected>Главная технология роли</option>
+                        {
+                            roles[role].map(technology => (
+                                <option value={technology}>{technology}</option>
+                            ))
+                        }
+                    </select>
+                : ""}</div>
+                
+                <textarea style={{marginLeft: '5vw'}} placeholder="Write what is required or nice to have for this role" id="niceToHave"/>
+                <button onClick={AddRole}>Добавить роль</button>
+            </div>
+            : ""}</div>
+            <h2>Открытые роли:</h2>
+            <ul>
+                {teamRoles.map(role => (
+                    <li key={role.serialId}>
+                        <h3>{role?.Name ? role.Name : role.Role} {role.MainTechnology}</h3>
+                        <p>{role.NiceToHave}</p>
+                        <BsFileExcel style={{color: "white", fontSize: 40}} onClick={() => setTeamRoles(teamRoles.filter(teamRole => teamRole.serialId != role.serialId))}/>
+                        
+                    </li>
+                ))}
+            </ul>
+            
+            <button onClick={() => RequestToApi(EditTeam, SaveTeamEditing)}>Изменить</button>
+            {
+                status == "ok" ?
+                <h3 style={{color: "green"}}>Команда успешно отредактирована</h3>
+                :
+                <h3>{status}</h3>
+            }
+        </div>
+    )
+    async function GetTeam() {
+        const response = await fetch(`${backend}/api/teams/${params.id}`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+            }
+        })
+        return response
+    }
+    function SaveTeam(data, status) {
+        if (status == 200) {
+            setTeamRoles(data.team.Roles.filter(role => role?.IsOpen))
+            setTeamName(data.team.ProjectName)
+            setDescription(data.team.Description)
+        }
+        else {
+            setStatus("Плохое соединение")
+        }
+    }
+    function AddRole() {
+        if (document.getElementById("roleMainTechnology") != null) {
+            let isCorrectTech = false
+            for (let technology of roles[role]) {
+                if (technology == document.getElementById("roleMainTechnology").value) {
+                    isCorrectTech = true
+                }
+            }
+            if (!isCorrectTech) {
+                return
+            }
+        }
+        
+        if (role == "") {
+            return
+        }
+        
+        setTeamRoles([...teamRoles, {serialId: ++serialId, Name: role, MainTechnology: document.getElementById("roleMainTechnology") != null ? document.getElementById("roleMainTechnology").value : "", NiceToHave: document.getElementById("niceToHave").value, IsOpen: true, TeamId: 0, Id: 0}])
+        document.getElementById("roleName").value = ""
+        if (document.getElementById("roleMainTechnology") != null) {
+            document.getElementById("roleMainTechnology").value = ""
+        }
+        document.getElementById("niceToHave").value = ""
+        console.log(teamRoles)
+        setIsAdded(true)
+        setRole("")
+        setSerialId(serialId + 1)
+    }
+    
+    function SaveTeamEditing(data, status) {
+        if (status == 200) {
+            setStatus("ok")
+            setTeamRoles([])
+            document.getElementById("teamName").value = ""
+            document.getElementById("teamDescriptions").value = ""
+            setUserRole(null)
+        }
+        else {
+            if (status == 500) {
+                setStatus(data.message)
+            }
+        }
+    }
+    async function EditTeam() {
+        const allRoles = [...teamRoles]
+        allRoles.push(userRole)
+        const data = {
+            projectName: document.getElementById("teamName").value,
+            description: document.getElementById("teamDescription").value,
+            roles: allRoles
+        }
+        const response = await fetch(`${backend}/api/teams/${params.id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+            },
+            body: JSON.stringify(data)
+        })
+        return response
     }
 }

@@ -3,33 +3,40 @@ body {
   background-attachment: fixed;
 }
 
-div {
+div:not(.react-monaco-editor-container *) {
   width: 100vw;
   display: flex;
   flex-direction: column;
   place-items: center;
 }
-
+.monaco-editor {
+  padding: 20px;
+  border-radius: 20px;
+}
 ul {
   padding: 0;
 }
 
 .chosenPage {
   margin-top: 30px;
-  position: relative; /* Необходимо для позиционирования псевдоэлемента */
-  display: inline-block; /* Чтобы подчеркивание не занимало всю ширину строки */
-  padding-bottom: 15px; /* Компенсирует высоту подчеркивания, чтобы текст не налезал на него */
+  position: relative;
+  display: inline-block;
+  padding-bottom: 15px;
 }
 
 .chosenPage::after {
   content: '';
   position: absolute;
   left: -25%;
-  bottom: 0; /* Размещаем псевдоэлемент внизу */
+  bottom: 0;
   width: 150%;
-  height: 7px; /* Толщина подчеркивания */
-  background-color: white; /* Цвет подчеркивания */
-  border-radius: 5px; /* Закругляем концы */
+  height: 7px;
+  background-color: white;
+  border-radius: 5px;
+}
+.chosenAnswer {
+  background-color: #B57BDC;
+  box-shadow: 0px 4px 70px #B57BDC;
 }
 
 li {
@@ -166,10 +173,44 @@ textarea {
   width: 80vw;
   max-width: 400px;
   height: 30vh;
-  padding: 10px;
+  padding: 15px;
   border-radius: 40px;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(40px);
   border: none;
   outline: none;
+}
+
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  margin-top: 5vh;
+}
+
+.dot {
+  width: 40px;
+  animation: blink 1.4s infinite both;
+}
+
+.dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes blink {
+  0%, 20% {
+      opacity: 0;
+  }
+  50% {
+      opacity: 1;
+  }
 }

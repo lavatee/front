@@ -1,14 +1,16 @@
 import './App.css';
 import React, { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
-import Auth from './Auth';
-import { NewTeam, OneTeam, Teams, UserTeams } from './Teams';
+import { BrowserRouter, Routes, Route, useNavigate, useParams } from 'react-router-dom'
+import {Auth, ByCode} from './Auth';
+import { EditTeam, NewTeam, OneTeam, Teams, UserTeams } from './Teams';
 import { NewRequest, UserRequests } from './Requests';
 import { UserProfile } from './Users';
 import { ChatMembers, ChatTasks, OneChat, UserChats } from './Chats';
 import { BsList, BsFillPeopleFill, BsFillPersonFill, BsChatRightDotsFill, BsBagCheckFill, BsFillBellFill, BsClipboardCheckFill } from "react-icons/bs";
 import { TasksUserCreated, UserCompletedTasks, UserCurrentTasks, UserFailedTasks } from './Tasks';
 import { UserExperience } from './Experience';
+import { Interview, UserInterviews } from './Interviews';
+import { FaR, FaRobot } from "react-icons/fa6";
 export const backend = "http://localhost:8000"
 export const wsAddress = "ws://77.222.46.250/api/chat/:chatid/user/:userid"
 
@@ -57,11 +59,36 @@ function App() {
         <Route exact path='/mytasks/failed' element={<UserFailedTasks/>}/>
         <Route exact path='/mytasks/completed' element={<UserCompletedTasks/>}/>
         <Route exact path='/experience' element={<UserExperience/>}/>
-        
+        <Route exact path='/ref/:link' element={<Auth/>}/>
+        <Route exact path='/interviews' element={<UserInterviews/>}/>
+        <Route exact path='/interview/:id' element={<Interview/>}/>
+        <Route exact path='/by_code' element={<ByCode/>}/>
+        <Route exact path='/edit_team/:id' element={<EditTeam/>}/>
+        <Route exact path='/taganrog' element={<Taganrog/>}/>
       </Routes>
     </BrowserRouter>
   );
 }
+
+function Taganrog() {
+  return(
+    <img src='/img/taganrog.png' style={{height: "100vh"}}/>
+  )
+}
+
+// function Ref() {
+//   const navigate = useNavigate()
+//   const params = useParams()
+//   if (!params.link) {
+//     navigate("/")
+//   } else {
+//       localStorage.setItem("action", "ref")
+//       localStorage.setItem("refLink", params.link)
+//       navigate("/")
+//   }
+//   console.log("navigate to /")
+//   return null
+// }
 
 export function Header(props) {
   const [state, setState] = useState(false)
@@ -72,7 +99,9 @@ export function Header(props) {
       <BsList style={{color: "white", position: 'absolute', left: '10vw', top: '6vh', fontSize: 30}} onClick={() => setState(!state)}/>
       
       
-      <img src='https://raw.githubusercontent.com/lavatee/facepalm/refs/heads/main/img/eachother.png' style={{width: '15vw', minWidth: 120}}/>
+      <img src='/img/eachother_full.png' style={{width: '12vw', minWidth: 150}}/>
+      <a href='https://t.me/+nDlnjB2WWsQ1MDcy' target="_blank" style={{position: "absolute", right: "10vw"}}><img src='/img/telegram.svg' style={{width: "30px"}}/></a>
+      
       
     </div>
     {state ?
@@ -83,6 +112,8 @@ export function Header(props) {
           <h4 onClick={() => navigate("/notifications")} style={{fontWeight: props.page == "notifications" ? 900 : 400}}><BsFillBellFill style={{color: "white", fontSize: 15}}/> Уведомления</h4>
           <h4 onClick={() => navigate("/mytasks/current")} style={{fontWeight: props.page == "tasks" ? 900 : 400}}><BsClipboardCheckFill style={{color: "white", fontSize: 15}}/> Задачи</h4>
           <h4 onClick={() => navigate("/experience")} style={{fontWeight: props.page == "experience" ? 900 : 400}}><BsBagCheckFill style={{color: "white", fontSize: 15}}/> Мой опыт</h4>
+          <h4 onClick={() => navigate("/interviews")} style={{fontWeight: props.page == "interviews" ? 900 : 400}}><FaRobot style={{color: "white", fontSize: 15}}/> Собеседования</h4>
+          
         </div>
       : ""
     }

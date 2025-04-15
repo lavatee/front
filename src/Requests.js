@@ -11,6 +11,9 @@ export function NewRequest() {
     console.log(params)
     const [team, setTeam] = useState(null)
     const [message, setMessage] = useState("")
+    const [isSent, setIsSent] = useState(false)
+    const [interviewId, setInterviewId] = useState(0)
+    const [isLoading, setIsLoading] = useState(false)
     useEffect(() => {
         RequestToApi(GetTeam, SaveTeam)
         console.log(team)
@@ -24,19 +27,47 @@ export function NewRequest() {
                 <option value="" disabled selected>Ваша роль в команде</option>
                 {   team != null ?
                     team.Roles.map(role => (
-                        <option value={role.Id}>{role?.IsOpen ? role.Name : ""}{role?.IsOpen && role.MainTechnology != undefined ? " " + role.MainTechnology : ""}</option>
+                        <>
+                        {
+                            role?.IsOpen ? <option value={role.Id}>{role.Name}{role?.IsOpen && role.MainTechnology != undefined ? " " + role.MainTechnology : ""}</option> : ""
+                        }
+                        </>
                     )) : ""
                 }
             </select>
             <textarea placeholder="Напишите немного о своем опыте (максимум 200 символов)" id="cv"/>
             {
                 message == "ok" ? "" :
-                <button onClick={() => RequestToApi(SendRequest, SaveSendRequest)}>Send request</button>
+                <button onClick={() => RequestToApi(SendRequest, SaveSendRequest)}>Отправить запрос</button>
             }
+            {
+                interviewId == 0 && !isLoading ?
+                <button disabled={isSent ? false : true} onClick={isSent ? GenerateInterview : () => alert("Отправьте запрос")}>ИИ Собеседование</button>
+                : (isLoading ? <div style={{flexDirection: "row", marginTop: "10px"}} className="loader"><img src="/img/loading.png" className="dot"/><img src="/img/loading.png" className="dot"/><img src="/img/loading.png" className="dot"/></div> : <button onClick={() => navigate(`/interview/${interviewId}`)}>Приступить к собеседованию</button>)
+            }
+            
+            <p style={{background: "rgba(255, 255, 255, 0.1)", boxShadow: "0px 4px 70px rgba(0, 0, 0, 0.7)", backdropFilter: "blur(40px)", padding: "15px", borderRadius: "40px"}}>Отправьте запрос и пройдите собеседование от ИИ для увеличение шансов попадания в команду</p>
             
             <h2 style={{color: message == "ok" ? "green" : "red"}}>{message == "ok" ? "Запрос отправлен успешно" : message}</h2>
         </div>
     )
+    async function GenerateInterview() {
+        setIsLoading(true)
+        const socket = new WebSocket(`ws://localhost:8000/ws/interviews/generate/${params.teamid}/user/${localStorage.getItem("access_token")}`);
+        socket.onmessage = SaveInterview
+        socket.onclose = ()  => {
+            
+            setIsLoading(false)
+        }
+    }
+    function SaveInterview(event) {
+        setIsLoading(false)
+        const data = JSON.parse(event.data)
+        setInterviewId(data)
+        // } else {
+        //     setMessage("Ошибка при составлении собеседования")
+        // }
+    }
     async function GetTeam() {
         
         const response = await fetch(`${backend}/api/teams/${params.teamid}`, {
@@ -77,6 +108,7 @@ export function NewRequest() {
     function SaveSendRequest(data, status) {
         if (status == 200) {
             setMessage("ok")
+            setIsSent(true)
         }
         else {
             setMessage(data.message)

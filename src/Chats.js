@@ -4,6 +4,7 @@ import { backend, Header, mainPage, RequestToApi, wsAddress } from "./App";
 import { useParams } from 'react-router-dom';
 import { BsArrowLeftCircleFill, BsFillSendFill, BsCheckCircleFill, BsFillClockFill } from "react-icons/bs";
 import './App.css';
+import { IoCopyOutline, IoCopy } from "react-icons/io5";
 
 export function GetProductivityImg(productivity) {
     if (productivity <= 24) {
@@ -93,7 +94,7 @@ export function ChatHeader(props) {
 
 export function OneChat() {
     const params = useParams()
-    const socket = new WebSocket(`ws://localhost:8000/ws/chat/${params.id}/user/${localStorage.getItem("user_id")}`);
+    const socket = new WebSocket(`ws://localhost:8000/ws/chat/${params.id}/user/${localStorage.getItem("access_token")}`);
 
     socket.onopen = function(event) {
         console.log('Connected to the WebSocket server');
@@ -248,6 +249,7 @@ export function ChatMembers() {
     const [currentUserId, setCurrentUserId] = useState(0)
     const [currentUserRole, setCurrentUserRole] = useState("")
     const [date, setDate] = useState(new Date());
+    const [isRefCreating, setIsRefCreating] = useState(false)
     const navigate = useNavigate()
     useEffect(() => {
         RequestToApi(GetChat, SaveChat)
@@ -281,7 +283,7 @@ export function ChatMembers() {
         <div>
             {chat ? <ChatHeader Page="members" ChatId={params.id} TeamProjectName={chat.TeamProjectName}/> : ""}
             <h2 style={{marginTop: "25vh", zIndex: "500"}}>{message}</h2>
-            
+            <button onClick={() => setIsRefCreating(true)}>Создать пригласительную ссылку</button>
             <ul style={{marginTop: "0vh"}}>
                 {users.map(user => (
                     <li>
@@ -301,6 +303,9 @@ export function ChatMembers() {
             }
             {
                 isLeave ? <LeaveState/> : ""
+            }
+            {
+                isRefCreating ? <RefCreating/> : ""
             }
         </div>
     )
@@ -343,6 +348,7 @@ export function ChatMembers() {
             </div>
         );
     }
+    
     async function PostTask() {
         const date = new Date(document.getElementById("deadline").value)
         const response = await fetch(`${backend}/api/tasks`, {
@@ -378,6 +384,7 @@ export function ChatMembers() {
             </div>
         )
     }
+
     async function LeaveTeam() {
         const response = await fetch(`${backend}/api/teams/leave`, {
             method: "POST",
@@ -394,6 +401,92 @@ export function ChatMembers() {
             navigate("/chats")
         } else {
             setMessage("Не удалось выйти из команды")
+        }
+    }
+    function RefCreating() {
+        const [team, setTeam] = useState(null)
+        const [link, setLink] = useState("")
+        const [isCopied, setIsCopied] = useState(false)
+        useEffect(() => {
+                RequestToApi(GetTeam, SaveTeam)
+                console.log(team)
+        }, [])
+        return (
+            <div style={{height: "100%", width: "101%", position: "fixed", background: "rgba(0, 0, 0, 0.4)", zIndex: "999"}}>
+                <div style={{width: "75vw", maxWidth: "500px", background: "rgba(255, 255, 255, 0.1)", boxShadow: "0px 4px 70px rgba(0, 0, 0, 0.7)", backdropFilter: "blur(40px)", padding: "25px 10px 25px 10px", marginTop: "10vh", borderRadius: "40px"}}>
+                    {
+                        !link ?
+                        <>
+                        <h2>Ссылка на вступление</h2>
+                        <select id="userRole">
+                            <option value="" disabled selected>На роль:</option>
+                            {   team != null ?
+                                team.Roles.map(role => (
+                                    <option value={role.Id}>{role?.IsOpen ? role.Name : ""}{role?.IsOpen && role.MainTechnology != undefined ? " " + role.MainTechnology : ""}</option>
+                                )) : ""
+                            }
+                        </select>
+                        <input style={{marginTop: "10px"}} placeholder="Сообщение пользователю" id="refMessage"/>
+                        <h3>Время жизни ссылки:</h3>
+                        <div style={{display: "flex", flexDirection: "row", width: "50%"}}>
+                            <input type="number" id="hours"/>
+                            <p>часов</p>
+                        </div>
+                        <button onClick={() => RequestToApi(PostRef, SaveRef)}>Сгенерировать ссылку</button>
+                        </>
+                        :
+                        <div style={{display: "flex", flexDirection: "row", width: "50%"}}>
+                            <input id="link" type="text" value={`${mainPage}/ref/${link}`}/>
+                            <button onClick={copyLink}>{isCopied ? <IoCopyOutline style={{color: "white"}}/> : <IoCopyOutline style={{color: "white"}}/>}</button>
+                        </div>
+                        
+                    }
+                    <button onClick={() => setIsRefCreating(false)}>Назад</button>
+                </div>
+            </div>
+        );
+        function copyLink() {
+            const inputField = document.getElementById("link");
+            inputField.select();
+            document.execCommand("copy");
+            setIsCopied(true)
+        }
+        async function PostRef() {
+                
+                const response = await fetch(`${backend}/api/refs`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+                    },
+                    body: JSON.stringify({roleId: Number(document.getElementById("userRole").value), message: document.getElementById("refMessage").value, timeoutHours: Number(document.getElementById("hours").value)})
+                })
+                return response
+        }
+        async function SaveRef(data, status) {
+            if (status == 200) {
+                setLink(data.link)
+            } else {
+                setIsRefCreating(false)
+                setMessage("Ошибка при создании ссылки")
+            }
+        }
+        async function GetTeam() {
+                
+                const response = await fetch(`${backend}/api/teams/${chat.TeamId}`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+                    }
+                })
+                return response
+        }
+        async function SaveTeam(data, status) {
+                if (status == 200) {
+                    setTeam(data.team)
+                }
+                else {
+                    setMessage(data.message)
+                }
         }
     }
 }
