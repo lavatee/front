@@ -94,7 +94,7 @@ export function ChatHeader(props) {
 
 export function OneChat() {
     const params = useParams()
-    const socket = new WebSocket(`ws://localhost:8000/ws/chat/${params.id}/user/${localStorage.getItem("access_token")}`);
+    const socket = new WebSocket(`ws://185.56.162.37/api/ws/ws/chat/${params.id}/user/${localStorage.getItem("access_token")}`);
 
     socket.onopen = function(event) {
         console.log('Connected to the WebSocket server');

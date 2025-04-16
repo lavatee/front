@@ -11,8 +11,8 @@ import { TasksUserCreated, UserCompletedTasks, UserCurrentTasks, UserFailedTasks
 import { UserExperience } from './Experience';
 import { Interview, UserInterviews } from './Interviews';
 import { FaR, FaRobot } from "react-icons/fa6";
-export const backend = "http://localhost:8000"
-export const wsAddress = "ws://77.222.46.250/api/chat/:chatid/user/:userid"
+export const backend = "/api"
+export const wsAddress = "ws://185.56.162.37/api/chat/:chatid/user/:userid"
 
 export const roles = {
   "Frontend Engineer": ["React", "Angular", "Vue"],
@@ -35,7 +35,7 @@ export const roles = {
   "Mobile Engineer": ["React Native", "Flutter"]
 }
 
-export const mainPage = "http://localhost:3000"
+export const mainPage = "http://185.56.162.37"
 
 function App() {
   return (
@@ -71,8 +71,17 @@ function App() {
 }
 
 function Taganrog() {
+  const [isOur, setIsOur] = useState(false)
   return(
-    <img src='/img/taganrog.png' style={{height: "100vh"}}/>
+    <div style={{marginTop: "15vh"}}>
+      <Header/>
+      {
+        isOur ?
+        <img src='/img/our_taganrog.png' style={{height: "70vh"}} onClick={() => setIsOur(false)}/>
+        :
+        <img src='/img/taganrog.png' style={{height: "70vh"}} onClick={() => setIsOur(true)}/>
+      }
+    </div>
   )
 }
 

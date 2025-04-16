@@ -53,7 +53,7 @@ export function NewRequest() {
     )
     async function GenerateInterview() {
         setIsLoading(true)
-        const socket = new WebSocket(`ws://localhost:8000/ws/interviews/generate/${params.teamid}/user/${localStorage.getItem("access_token")}`);
+        const socket = new WebSocket(`ws://185.56.162.37/api/ws/ws/interviews/generate/${params.teamid}/user/${localStorage.getItem("access_token")}`);
         socket.onmessage = SaveInterview
         socket.onclose = ()  => {
             
