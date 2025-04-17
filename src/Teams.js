@@ -144,6 +144,7 @@ export function NewTeam() {
     const [status, setStatus] = useState("")
     const [userRoleName, setUserRoleName] = useState("")
     const [isAdded, setIsAdded] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     for (let roleName in roles) {
         roleNames.push(roleName)
     }
@@ -159,7 +160,13 @@ export function NewTeam() {
             
             <textarea placeholder="Описание" id="teamDescription"/>
             <p>Если вы не знаете, какие роли вам нужны, вы можете сгенерировать их на основе названия и описания команды с помощью нашего ИИ:</p>
-            <button onClick={() => RequestToApi(GenerateRoles, SaveRoles)}>Сгенерировать роли</button>
+            {
+                isLoading ?
+                <button onClick={GenerateRoles}>Сгенерировать роли</button>
+                :
+                <div style={{flexDirection: "row", marginTop: "10px"}} className="loader"><img src="/img/loading.png" className="dot"/><img src="/img/loading.png" className="dot"/><img src="/img/loading.png" className="dot"/></div>
+            }
+            
             <h2>Добавьте роли, которые нужны в вашей команде</h2>
             <select id="roleName" onChange={() => setRole(document.getElementById("roleName").value)}>
                 <option value="" disabled selected>Роль</option>
@@ -327,34 +334,25 @@ export function NewTeam() {
         return response
     }
     async function GenerateRoles() {
-        const response = await fetch(`${backend}/api/ai_roles`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${localStorage.getItem("access_token")}`
-            },
-            body: JSON.stringify({ProjectName: document.getElementById("teamName").value, Description: document.getElementById("teamDescription").value})
-        })
-        return response
-    }
-    async function SaveRoles(data, status) {
-        if (status == 200) {
-            if (!data?.roles) {
-                setStatus("Ошибка при генерации ролей")
-                return
-            }
-            for (let i = 0; i < data.roles.length; i++) {
-                data.roles[i].serialId = i
-                data.roles[i].IsOpen = true
-                data.roles[i].TeamId = 0
-                data.roles[i].Id = 0
-                data.roles[i].Name = data.roles[i].Role
-            }
-            setSerialId(data.roles[data.roles.length - 1].serialId)
-            setTeamRoles(data?.roles)
-        } else {
-            setStatus("Ошибка при генерации ролей")
+        setIsLoading(true)
+        const socket = new WebSocket(`ws://185.56.162.37/api/ws/ws/roles/${document.getElementById("teamName").value}/${document.getElementById("teamDescription").value}`);
+        socket.onmessage = SaveRoles
+        socket.onclose = ()  => {
+            setIsLoading(false)
         }
+    }
+    async function SaveRoles(event) {
+        setIsLoading(false)
+        const roles = JSON.parse(event.data)
+        for (let i = 0; i < roles.length; i++) {
+            roles[i].serialId = i
+            roles[i].IsOpen = true
+            roles[i].TeamId = 0
+            roles[i].Id = 0
+            roles[i].Name = data.roles[i].Role
+        }
+        setSerialId(roles[roles.length - 1].serialId)
+        setTeamRoles(roles)
     }
 }
 
