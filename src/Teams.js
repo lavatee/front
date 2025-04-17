@@ -161,7 +161,7 @@ export function NewTeam() {
             <textarea placeholder="Описание" id="teamDescription"/>
             <p>Если вы не знаете, какие роли вам нужны, вы можете сгенерировать их на основе названия и описания команды с помощью нашего ИИ:</p>
             {
-                isLoading ?
+                !isLoading ?
                 <button onClick={GenerateRoles}>Сгенерировать роли</button>
                 :
                 <div style={{flexDirection: "row", marginTop: "10px"}} className="loader"><img src="/img/loading.png" className="dot"/><img src="/img/loading.png" className="dot"/><img src="/img/loading.png" className="dot"/></div>
