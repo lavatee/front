@@ -43,8 +43,8 @@ export function Teams() {
             <Header page="teams"/>
             <h2 style={{marginTop: "16vh"}}>{err}</h2>
             <div style={{display: "flex", justifyContent: "space-between", flexDirection: "row", marginTop: "2vh", maxWidth: "800px"}}>
-                <button onClick={() => navigate("/teams/new")}>Создать команду</button>
-                <button onClick={() => navigate(`/teams/${localStorage.getItem("user_id")}`)}>Мои команды</button>
+                <button onClick={() => navigate("/teams/new")}>Создать новую команду</button>
+                <button onClick={() => navigate(`/teams/${localStorage.getItem("user_id")}`)}>Команды созданные мной</button>
                 <button onClick={() => navigate("/requests")}>Запросы в мои команды</button>
             </div>
             <h1>Команды, имеющие открытые роли, подходящие вашему стеку:</h1>
