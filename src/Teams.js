@@ -349,7 +349,7 @@ export function NewTeam() {
             roles[i].IsOpen = true
             roles[i].TeamId = 0
             roles[i].Id = 0
-            roles[i].Name = data.roles[i].Role
+            roles[i].Name = roles[i].Role
         }
         setSerialId(roles[roles.length - 1].serialId)
         setTeamRoles(roles)
